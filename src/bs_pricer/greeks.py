@@ -28,3 +28,16 @@ def rho(S, K, T, r, sigma, q=0.0, option_type="call"):
         return -K * T * np.exp(-r * T) * norm.cdf(-d2)
     else:
         raise ValueError("option_type must be 'call' or 'put'")
+    
+def theta (S, K, T, r, sigma, q=0.0, option_type = "call"):
+    d1 = (np.log(S / K) + (r - q + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+    d2 = d1 - sigma * np.sqrt(T)
+
+    term1 = -S * np.exp(-q * T) * norm.pdf(d1) * sigma / (2 * np.sqrt(T))
+
+    if option_type == "call":
+        return term1 - r * K * np.exp(-r * T) * norm.cdf(d2) + q * S * np.exp(-q * T) * norm.cdf(d1)
+    elif option_type == "put":
+        return term1 + r * K * np.exp(-r * T) * norm.cdf(-d2) - q * S * np.exp(-q * T) * norm.cdf(-d1)
+    else:
+        raise ValueError("option_type must be 'call' or 'put'")
