@@ -38,7 +38,7 @@ def clean_chain(calls, spot, moneyness = 0.15):
 
     return df.reset_index(drop = True)
 
-def compute_smile(df, spot, T, r = 0.4, q = 0.0, option_type = "call"):
+def compute_smile(df, spot, T, r = 0.04, q = 0.0, option_type = "call"):
         strikes, ivs = [], []
 
         for _, row in df.iterrows():
