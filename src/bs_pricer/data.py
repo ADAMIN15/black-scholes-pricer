@@ -43,7 +43,7 @@ def compute_smile(df, spot, T, r = 0.04, q = 0.0, option_type = "call"):
 
         for _, row in df.iterrows():
             try:
-                iv = implied_vol(row["mid"], spot, row["strike"], T, r, q=q, option_type=option_type)
+                iv = implied_vol(row["mid"], spot, row["strike"], T, r, q=q, option_type = row.get("option_type", option_type))
             except (ValueError, ZeroDivisionError, OverflowError):
                 continue
 
@@ -66,3 +66,14 @@ def implied_spot(calls, puts, spot, T, r=0.04):
     s_eff = mid_c - mid_p + m["strike"] * np.exp(-r * T)
 
     return float(s_eff.median())
+
+def build_otm(calls, puts, s_eff, moneyness=0.15):
+    c = clean_chain(calls, s_eff, moneyness)
+    C = c[c["strike"] >= s_eff].copy()
+    c["option_type"] = "call"
+
+    p = clean_chain(puts, s_eff, moneyness)
+    p = p[p["strike"] < s_eff].copy()
+    p["option_type"] = "put"
+
+    return pd.concat([p, c]).sort_values("strike").reset_index(drop=True)
